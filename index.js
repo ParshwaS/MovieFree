@@ -1,36 +1,47 @@
 const express = require('express')
-const fetch = require('node-fetch');
+const ts = require('torrent-stream')
+require('./models')
+const mongoose = require('mongoose');
+const Movie = mongoose.model('movie');
 const app = express()
-const JsSoup = require('jssoup').default
-const WebTorrent = require('webtorrent')
 const Torrent = require('torrent-search-api')
 
 Torrent.enablePublicProviders();
 
-let client = new WebTorrent()
-
 const PORT = process.env.PORT || 3000
 
 torrents = Object();
+tors = Object();
 
 app.get('/addMag/:mag', async (req, res)=>{
-    let t = torrents[req.params.mag];
+    let t = tors[req.params.mag];
     if(!t){
         torrents[req.params.mag] = 'Requested';
-        let isThere = await client.get(req.params.mag);
-        if(!isThere){
-            client.add(req.params.mag, (torrent)=>{
-                console.log("Torrent Hash for "+req.params.mag+" is "+torrent.infoHash);
-                index = -1;
-                torrent.files.forEach((e, i)=>{
-                    if(e.name.includes(".mp4")||e.name.includes(".mkv")){
-                        index = i;
-                    }
-                })
-                torrents[req.params.mag] = index;
-                res.json(torrent.infoHash)
-            });
-        }
+        // let isThere = await client.get(req.params.mag);
+        // if(!isThere){
+        //     client.add(req.params.mag, (torrent)=>{
+        //         console.log("Torrent Hash for "+req.params.mag+" is "+torrent.infoHash);
+        //         index = -1;
+        //         torrent.files.forEach((e, i)=>{
+        //             if(e.name.includes(".mp4")||e.name.includes(".mkv")){
+        //                 index = i;
+        //             }
+        //         })
+        //         torrents[req.params.mag] = index;
+        //         res.json(torrent.infoHash)
+        //     });
+        // }
+        tors[req.params.mag] = ts(req.params.mag)
+        tors[req.params.mag].on('ready', ()=>{
+            var index = -1;
+            tors[req.params.mag].files.forEach((e, i)=>{
+                if(e.name.includes(".mp4")||e.name.includes(".mkv")){
+                    index = i;
+                }
+            })
+            torrents[req.params.mag] = index;
+            res.json(req.params.mag)
+        })
     }else{
         res.json("Is There!!")
     }
@@ -71,7 +82,7 @@ app.get('/search/:query', (req,res)=>{
 })
 
 app.get('/video/:mag', async (req, res)=>{
-    var tor = client.get(req.params.mag)
+    var tor = tors[req.params.mag];
     if(tor&&torrents[req.params.mag]>-1){
         let file = tor.files[torrents[req.params.mag]];
         let range = req.headers.range;
@@ -100,6 +111,10 @@ app.get('/video/:mag', async (req, res)=>{
 
 app.get('/', (req, res)=>{
     res.sendFile(__dirname+'/index.html');
+});
+
+app.get('/addNew', (req, res)=>{
+    res.sendFile(__dirname+'/addNew.html');
 });
 
 app.listen(PORT,()=>{

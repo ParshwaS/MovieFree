@@ -21,10 +21,11 @@ var MovieSchema = new Schema({
             size: { type: String },
             desc: { type: String },
             time: { type: String },
-            link: { type: String }
+            link: { type: String },
+            image: { type: String }
         }
     },
-    hash: { type: String }
+    hash: { type: String, unique: true }
 });
 
 model('movie', MovieSchema);

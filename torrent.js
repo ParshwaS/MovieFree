@@ -1,15 +1,10 @@
-const Torrent = require('torrent-search-api')
+const torrent = require('torrent-stream')
 
-Torrent.enablePublicProviders();
+var engine = torrent('0BA66BFA81F29F96D58D4C896FC30DFF9F24F784')
 
-Torrent.search('Incredibles 2', 'Movies', 50).then((data)=>{
-    let final = []
-    data.forEach(e => {
-        if(e.title.includes("Incredibles")){
-            Torrent.getMagnet(e).then((mag)=>{
-                final.push({details: e, magnet: mag});
-            })
-        }
+engine.on('ready', ()=>{
+    engine.files.forEach((file)=>{
+        console.log("Filename: ", file.name);
     })
-    res.json(final);
+    engine.destroy();
 })
