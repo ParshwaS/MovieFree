@@ -4,7 +4,6 @@ const app = express()
 const JsSoup = require('jssoup').default
 const WebTorrent = require('webtorrent')
 const Torrent = require('torrent-search-api')
-const { RSA_NO_PADDING } = require('constants')
 
 Torrent.enablePublicProviders();
 
@@ -101,10 +100,6 @@ app.get('/video/:mag', async (req, res)=>{
 
 app.get('/', (req, res)=>{
     res.sendFile(__dirname+'/index.html');
-});
-
-app.get('/sec', (req, res)=>{
-    res.sendFile(__dirname+'/index2.html');
 });
 
 app.listen(PORT,()=>{
