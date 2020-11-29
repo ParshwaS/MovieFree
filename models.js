@@ -22,10 +22,18 @@ var MovieSchema = new Schema({
             desc: { type: String },
             time: { type: String },
             link: { type: String },
-            image: { type: String }
+            image: { type: String },
+            subtitle: { type: String }
         }
     },
-    hash: { type: String, unique: true }
+    hashes: { 
+        type: [
+            {
+                lang: { type: String },
+                hash: { type: String }
+            }
+        ]
+    }
 });
 
 model('movie', MovieSchema);
