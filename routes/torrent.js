@@ -72,6 +72,7 @@ module.exports = function(app){
             let file = tor.files[torrents[req.params.mag]];
             let range = req.headers.range;
             let positions = range.replace(/bytes=/, "").split("-");
+            console.log(positions);
             let start = parseInt(positions[0], 10)
             let file_size = file.length
             let end = positions[1] ? parseInt(positions[1], 10) : file_size - 1;
