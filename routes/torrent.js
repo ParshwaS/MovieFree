@@ -1,5 +1,6 @@
 const ts = require('torrent-stream')
 const Torrent = require('torrent-search-api')
+const rm = require('rimraf')
 
 Torrent.enablePublicProviders();
 
@@ -30,6 +31,11 @@ module.exports = function(app){
         }else{
             res.json("Is There!!")
         }
+    })
+
+    app.get('/remAll', (req, res)=>{
+        rm.sync('./tmp');
+        res.json('Done');
     })
     
     function xyz(e){

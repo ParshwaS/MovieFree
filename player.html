@@ -32,8 +32,46 @@
             <source src="" id="play">
             <track kind="subtitles" srclang="en" src="" id="subs">
         </video>
+        <button onclick="addDelay()">Add</button>
+        <button onclick="remDelay()">Remove</button>
     </div>
     <script>
+        function addOffset(videoId, offset) {
+            const video = document.getElementById(videoId);
+            if (video) {
+                Array.from(video.textTracks).forEach((track) => {
+                    if (track.mode === 'showing') {
+                        Array.from(track.cues).forEach((cue) => {
+                            cue.startTime += offset || 0.5;
+                            cue.endTime += offset || 0.5;
+                        });
+                        return true;
+                    }
+                });
+            }
+            return false;
+        }
+        function removeOffset (videoId, offset) {
+            const video = document.getElementById(videoId);
+            if (video) {
+                Array.from(video.textTracks).forEach((track) => {
+                    if (track.mode === 'showing') {
+                        Array.from(track.cues).forEach((cue) => {
+                            cue.startTime -= offset || 0.5;
+                            cue.endTime -= offset || 0.5;
+                        });
+                        return true;
+                    }
+                });
+            }
+            return false;
+        }
+        function addDelay(){
+            addOffset('VPlayer', 0.5);
+        }
+        function remDelay(){
+            removeOffset('VPlayer', 0.5);
+        }
         var id;
         $(document).ready(()=>{
             id = window.location.href.split('/')[4];
