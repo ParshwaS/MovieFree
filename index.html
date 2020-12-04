@@ -38,7 +38,10 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
-                    <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                    <a class="nav-link" href="/">Movies <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/series">Series</a>
                 </li>
             </ul>
         </div>
@@ -49,13 +52,16 @@
             
         </div>
     </div>
+    <div style="border-top: 1px solid black;" class="mt-3 pt-2 pb-2 text-center">
+        Made with ❤️ by Parshwa Shah
+    </div>
     <script>
         var docs = [];
         $(document).ready(()=>{
             $.get('/movies/list', (data)=>{
                 data.forEach((element,i) => {
                     docs.push(element);
-                    $('#listMovies').append('<div class="col-md-2 col-sm-3"><div class="card"><img src="'+element.details.image+'" class="card-img-top"><div class="card-body"><h5 class="card-title">'+element.details.title+'</h5><p class="card-text">'+element.details.desc+'</p><a onclick="playMovie('+i+')" class="btn btn-primary">Play Now</a></div></div></div>');
+                    $('#listMovies').append('<div class="col-md-2 col-sm-2 mt-3" style="font-size: 0.2rem"><div class="card"><img src="'+element.details.image+'" style="height: 20rem;" class="card-img-top"><div class="card-body text-center"><h5 class="card-title">'+element.details.title+'</h5><a onclick="playMovie('+i+')" class="btn btn-secondary">Play</a></div></div></div>');
                 });
                 
             });
@@ -64,11 +70,7 @@
         function playMovie(i){
             var movie = docs[i];
             $('body').addClass('loading');
-            $.get('/addMag/'+movie.hashes[0].hash, (resp)=>{
-                if(resp!="ERROR"){
-                    window.location.href = '/player/'+movie._id;
-                }
-            });
+            window.location.href = '/player/'+movie._id;
         }
     </script>
 </body>

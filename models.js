@@ -37,3 +37,24 @@ var MovieSchema = new Schema({
 });
 
 model('movie', MovieSchema);
+
+var SeriesSchema = new Schema({
+    name: { type: String },
+    seasons: {
+        type: [
+            {
+                episodes: {
+                    type: [
+                        {
+                            name: { type: String },
+                            hash: { type: String },
+                            file: { type: Number }
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+});
+
+model('series', SeriesSchema);

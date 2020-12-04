@@ -16,7 +16,7 @@ module.exports = function(app){
             tors[req.params.mag].on('ready', ()=>{
                 var index = -1;
                 tors[req.params.mag].files.forEach((e, i)=>{
-                    if(e.name.includes(".mp4")||e.name.includes(".mkv")){
+                    if(e.name.includes(".mp4")||e.name.includes(".mkv")||e.name.includes(".avi")){
                         index = i;
                     }
                 })

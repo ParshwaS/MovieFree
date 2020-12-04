@@ -20,8 +20,11 @@
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/">Movies <span class="sr-only">(current)</span></a>
+                </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/">Home</a>
+                    <a class="nav-link" href="/series">Series</a>
                 </li>
             </ul>
         </div>
@@ -32,34 +35,44 @@
             <source src="" id="play">
             <track kind="subtitles" srclang="en" src="" id="subs">
         </video>
-        <button onclick="addDelay()">Add</button>
-        <button onclick="remDelay()">Remove</button>
+        <br/>
+        <button class="btn btn-sm btn-primary" onclick="remDelay()">&lt;&lt;</button>
+        <input class="form-control" style="width: 3rem; display: inline-block;" id="sub_delay" value="0.0"><p> Sec</p>
+        <button class="btn btn-sm btn-primary" onclick="addDelay()">&gt;&gt;</button>
+    </div>
+    <div style="border-top: 1px solid black;" class="mt-3 pt-2 pb-2 text-center">
+        Made with ❤️ by Parshwa Shah
     </div>
     <script>
+        var delay = 0.0;
         function addOffset(videoId, offset) {
             const video = document.getElementById(videoId);
             if (video) {
                 Array.from(video.textTracks).forEach((track) => {
                     if (track.mode === 'showing') {
+                        delay += offset || 0.5;
                         Array.from(track.cues).forEach((cue) => {
                             cue.startTime += offset || 0.5;
                             cue.endTime += offset || 0.5;
                         });
+                        $('#sub_delay').val(delay);
                         return true;
                     }
                 });
             }
             return false;
         }
-        function removeOffset (videoId, offset) {
+        function removeOffset(videoId, offset) {
             const video = document.getElementById(videoId);
             if (video) {
                 Array.from(video.textTracks).forEach((track) => {
                     if (track.mode === 'showing') {
+                        delay -= offset || 0.5;
                         Array.from(track.cues).forEach((cue) => {
                             cue.startTime -= offset || 0.5;
                             cue.endTime -= offset || 0.5;
                         });
+                        $('#sub_delay').val(delay);
                         return true;
                     }
                 });
@@ -72,12 +85,21 @@
         function remDelay(){
             removeOffset('VPlayer', 0.5);
         }
+        $('#sub_delay').on('change', ()=>{
+            addOffset('VPlayer', parseFloat($('#sub_delay').val())-delay);
+        });
         var id;
         $(document).ready(()=>{
             id = window.location.href.split('/')[4];
             $.get('/movies/get/'+id, (data)=>{
+                $.get('/addMag/'+data.hashes[0].hash, (resp)=>{
+                    if(resp=="ERROR"){
+                        alert("Something Went Wrong!!");
+                    }else{
+                        $('#VPlayer').attr('src','/video/'+data.hashes[0].hash);
+                    }
+                });
                 $('#title').html(data.details.title);
-                $('#VPlayer').attr('src','/video/'+data.hashes[0].hash);
                 $('#subs').attr('src',data.details.subtitle);
             })
         });
