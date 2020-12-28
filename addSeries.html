@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Torrent Link Fetcher & Streamer</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous">
+</head>
+<body style="overflow-x: hidden;">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Free Movies</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="/addNew">Add New</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <br />
+    <h2 class="text-center">Torrent Search and Add</h2>
+    <div class="row mt-5">
+        <div class="col-md-6">
+            <h4 id="stat"></h4>
+            <video width="100%" id="VPlayer" controls>
+                <source src="/video">
+            </video><br>
+            <button id="toggleButton" class="btn btn-primary">Play/Pause</button>
+        </div>
+        <div class="col-md-6">
+            <p>Play Directly From Hash:</p>
+            <input class="form-control col-md-8" id="hinp">
+            <br>
+            <button id="hbtn" class="btn btn-outline-success">Play</button>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row mt-5" id="series">
+            <div class="col-md-6">
+                <label>Title</label>
+                <input class="form-control" v-model="title">
+                <label>Desc</label>
+                <textarea class="form-control" rows="3" v-model="desc"></textarea>
+                <label>Image</label>
+                <input class="form-control" v-model="image">
+            </div>
+            <div class="col-md-6">
+                <label>Seeds</label>
+                <input class="form-control" v-model="seeds">
+                <label>Peers</label>
+                <input class="form-control" v-model="peers">
+                <label>Subtitle: </label>
+                <input type="file" class="mt-3 mb-3" id="subF">
+                <input type="hidden" v-model="sub" id="sub">
+                <button class="btn btn-info" onclick="addSeries()">Add Series</button>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <script>
+        var series = new Vue({
+            el: '#series',
+            data: {
+                title: '',
+                desc: '',
+                image: '',
+                seeds: '',
+                peers: '',
+                seasons: [
+                    {
+                        no: '',
+                        episodes: [
+                            {
+                                name: '',
+                                hash: '',
+                                subtitle: ''
+                            }
+                        ]
+                    }
+                ],
+                
+            }
+        })
+        const toBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+        var chash = '';
+        function playHash(hash){
+            chash = hash;
+            $('#stat').html('Loading....');
+            $.get('/addMag/'+hash, function(data, status){
+                if(status=='success'){
+                    $('#stat').html('');
+                    $('#VPlayer').attr('src', '/video/'+hash);
+                }
+            });
+        }
+        $('#hbtn').on('click', function(){
+            playHash($('#hinp').val());
+        });
+        const VP = document.getElementById('VPlayer') // player
+        const VPToggle = document.getElementById('toggleButton') // button
+        VPToggle.addEventListener('click', function() {
+            if (VP.paused) VP.play()
+            else VP.pause()
+        })
+        $('#subF').on('change', async ()=>{
+            var file = document.querySelector('input[type=file]').files[0];
+            var base64 = await toBase64(file);
+            base64 = "data:subtitle/text;"+base64.split(";")[1];
+            $('#sub').val(base64)
+        })
+        function addMovie(){
+            var movie = {
+                details: {
+                    title: $('#title').val(),
+                    desc: $('#desc').val(),
+                    image: $('#image').val(),
+                    seeds: $('#seeds').val(),
+                    peers: $('#peers').val(),
+                    subtitle: $('#sub').val()
+                },
+                hashes: [
+                    {
+                        lang: "English",
+                        hash: $('#hasm').val()
+                    }
+                ]
+            }
+            $.ajax({
+                method: 'POST',
+                url: '/movies/add',
+                data: JSON.stringify(movie),
+                success: (data)=>{
+                    if(data.success){
+                        alert('Success');
+                    }
+                },
+                contentType: 'application/json',
+                dataType: 'json'
+            })
+        }
+    </script>
+</body>
+</html>

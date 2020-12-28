@@ -15,17 +15,46 @@ module.exports = function(app){
             tors[req.params.mag] = ts(req.params.mag, {tmp: 'tmp'})
             tors[req.params.mag].on('ready', ()=>{
                 var index = -1;
+                var names = []
                 tors[req.params.mag].files.forEach((e, i)=>{
                     if(e.name.includes(".mp4")||e.name.includes(".mkv")||e.name.includes(".avi")){
                         index = i;
                     }
+                    names.push(e.name)
                 })
                 torrents[req.params.mag] = index;
-                res.json(req.params.mag)
+                res.json(names);
             })
             tors[req.params.mag].on('error', ()=>{
                 delete tors[req.params.mag];
                 delete torrents[req.params.mag];
+                res.json("ERROR")
+            })
+        }else{
+            res.json("Is There!!")
+        }
+    })
+
+    app.post('/addMag', async (req, res)=>{
+        let t = torrents[req.body.mag];
+        if(!t){
+            torrents[req.body.mag] = 'Requested';
+            tors[req.body.mag] = ts(req.body.mag, {tmp: 'tmp'})
+            tors[req.body.mag].on('ready', ()=>{
+                var index = -1;
+                var names = []
+                tors[req.body.mag].files.forEach((e, i)=>{
+                    if(e.name.includes(".mp4")||e.name.includes(".mkv")||e.name.includes(".avi")){
+                        index = i;
+                    }
+                    names.push(e.name)
+                })
+                torrents[req.body.mag] = index;
+                res.json({files: names, index: index});
+            })
+            tors[req.body.mag].on('error', ()=>{
+                delete tors[req.body.mag];
+                delete torrents[req.body.mag];
                 res.json("ERROR")
             })
         }else{
@@ -44,6 +73,10 @@ module.exports = function(app){
             return {details: e, hash: fmag};
         })
     }
+
+    app.get('/files/:mag', (req, res)=>{
+        res.json(tors[req.params.mag].files)
+    });
     
     app.get('/search/:query', (req,res)=>{
         Torrent.search(req.params.query, 'Movies', 15).then((data)=>{

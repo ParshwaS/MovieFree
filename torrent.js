@@ -1,10 +1,18 @@
-const torrent = require('torrent-stream')
+const Craw = require("crawler");
 
-var engine = torrent('0BA66BFA81F29F96D58D4C896FC30DFF9F24F784')
+var c = new Craw({
+	callback: function (error, res, done) {
+		if (error) {
+			console.log(error);
+		} else {
+			var $ = res.$;
+			console.log($('table tr').map(function() {
+				return $(this).find('td').map(function() {
+				  return $(this).html();
+				}).get();
+			  }).get());
+		}
+	}
+});
 
-engine.on('ready', ()=>{
-    engine.files.forEach((file)=>{
-        console.log("Filename: ", file.name);
-    })
-    engine.destroy();
-})
+c.queue('https://eztv.re/search/?q1=&q2=1582&search=Search');
