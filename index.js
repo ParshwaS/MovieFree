@@ -6,16 +6,16 @@ const bp = require('body-parser');
 const app = express()
 const server = require('http').Server(app);
 const cors = require('cors')
-// const { ExpressPeerServer } = require('peer');
-// const peerServer = ExpressPeerServer(server,{
-//     debug: true
-// })
+const { ExpressPeerServer } = require('peer');
+const peerServer = ExpressPeerServer(server,{
+    debug: true
+})
 const io = require('socket.io')(server);
 
 app.use(bp.json({limit: '50mb'}));
 app.use(comp());
 app.use(cors());
-// app.use('/peerjs', peerServer);
+app.use('/peerjs', peerServer);
 
 const PORT = process.env.PORT || 80
 
@@ -28,10 +28,12 @@ io.on('connection', socket => {
         streams[roomId] = peerId;
         host[roomId] = socket;
         console.log('Room created with peerId of '+peerId);
+        console.log("Room's Id: "+roomId);
     })
 
     socket.on('join-room', (roomId, id)=>{
         socket.emit('roomId', streams[roomId]);
+        console.log("Viewer Entered in Room: "+roomId);
         host[roomId].emit('user-connected', id);
     })
 })

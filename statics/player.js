@@ -44,7 +44,11 @@ $('#sub_delay').on('change', () => {
     addOffset('VPlayer', parseFloat($('#sub_delay').val()) - delay);
 });
 var id;
-const myPeer = new Peer()
+const myPeer = new Peer(undefined, {
+    host: '/',
+    path: '/peerjs',
+    port: '80'
+})
 const peers = {}
 let roomId = Math.floor(Math.random()*1000000);
 myPeer.on('open', (id)=>{
@@ -64,7 +68,9 @@ $('#share').on('click', ()=>{
     }
     $('#room').append('RoomId = '+roomId);
     socket.on('user-connected', id=>{
+        console.log("User Connected Streaming User The Movie");
         const call = myPeer.call(id, stream);
+        peers[id] = call;
     })
 });
 
