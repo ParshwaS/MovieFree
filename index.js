@@ -20,16 +20,19 @@ app.use(cors());
 const PORT = process.env.PORT || 3000
 
 const streams = {};
+const host = {};
 
 io.on('connection', socket => {
     
     socket.on('create-room', (roomId, peerId)=>{
         streams[roomId] = peerId;
+        host[roomId] = socket;
         console.log('Room created with peerId of '+peerId);
     })
 
-    socket.on('join-room', (roomId)=>{
+    socket.on('join-room', (roomId, id)=>{
         socket.emit('roomId', streams[roomId]);
+        host[roomId].emit('user-connected', id);
     })
 })
 

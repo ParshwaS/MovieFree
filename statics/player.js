@@ -63,12 +63,8 @@ $('#share').on('click', ()=>{
         stream = null;
     }
     $('#room').append('RoomId = '+roomId);
-    myPeer.on('call', call => {
-        console.log('Call Answered!');
-        call.answer(stream);
-        call.on('stream', stream=>{
-            console.log("Streammmmmmmmm")
-        })
+    socket.on('user-connected', id=>{
+        const call = myPeer.call(id, stream);
     })
 });
 
