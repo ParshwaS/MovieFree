@@ -17,7 +17,7 @@ app.use(comp());
 app.use(cors());
 // app.use('/peerjs', peerServer);
 
-const PORT = process.env.PORT || 3000
+const PORT = process.env.PORT || 80
 
 const streams = {};
 const host = {};
