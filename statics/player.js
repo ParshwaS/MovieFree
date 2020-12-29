@@ -44,16 +44,103 @@ $('#sub_delay').on('change', () => {
     addOffset('VPlayer', parseFloat($('#sub_delay').val()) - delay);
 });
 var id;
+const Streamer = new Peer(undefined, {
+    host: '/',
+    path: '/peerjs',
+    port: '80'
+})
 const myPeer = new Peer(undefined, {
     host: '/',
     path: '/peerjs',
     port: '80'
 })
-const peers = {}
+const peers = {};
+let myVideoStream;
+const myVideo = document.createElement('video');
+myVideo.muted = true;
+navigator.mediaDevices.getUserMedia({video: true, audio: true}).then(stream => {
+    myVideoStream = stream;
+    addVideo(myVideo, myVideoStream);
+    myPeer.on('call', call=>{
+        call.answer(stream);
+        const video = document.createElement('video');
+        call.on('stream', uStream=>{
+            addVideo(video, uStream);
+        })
+    })
+
+    socket.on('user-connected', (id)=>{
+        connectTo(id, stream);
+    })
+})
+
+socket.on('user-disconnected', (id)=>{
+    if(peers[id]) peers[id].close();
+})
+
+function connectTo(id, stream){
+    const call = myPeer.call(id, stream);
+    console.log("New User Entered Call");
+    const video = document.createElement('video');
+    call.on('stream', (uStream)=>{
+        addVideo(video, uStream);
+    })
+    call.on('close', ()=>{
+        video.remove();
+    })
+
+    peers[id] = call;
+}
+
+let videoGrid = document.getElementById('videoCall');
+function addVideo(video, stream){
+    console.log("Added");
+    video.srcObject = stream
+    video.addEventListener('loadedmetadata', () => {
+        video.play()
+    })
+    videoGrid.append(video)
+}
+
+var controls = new Vue({
+    el: '#controls',
+    data: {
+        mute: 'Mute',
+        video: 'Turn Off'
+    }
+})
+
+$('#mute').on('click', ()=>{
+    let en = myVideoStream.getAudioTracks()[0].enabled;
+    if(en){
+        myVideoStream.getAudioTracks()[0].enabled = false;
+        controls.mute = 'UnMute';
+    }else{
+        myVideoStream.getAudioTracks()[0].enabled = true;
+        controls.mute = 'Mute';
+    }
+})
+
+$('#turnV').on('click', ()=>{
+    let en = myVideoStream.getVideoTracks()[0].enabled;
+    if(en){
+        myVideoStream.getVideoTracks()[0].enabled = false;
+        controls.video = 'Turn On';
+    }else{
+        myVideoStream.getVideoTracks()[0].enabled = true;
+        controls.video = 'Turn Off';
+    }
+})
+
 let roomId = Math.floor(Math.random()*1000000);
-myPeer.on('open', (id)=>{
+Streamer.on('open', (id)=>{
     socket.emit('create-room', roomId, id);
 })
+
+$('#fullScreen').on('click', ()=>{
+    $('.mainScreen')[0].requestFullscreen();
+});
+
 $('#share').on('click', ()=>{
     let VPlayer = document.getElementById('VPlayer');
     let stream;
@@ -67,10 +154,8 @@ $('#share').on('click', ()=>{
         stream = null;
     }
     $('#room').append('RoomId = '+roomId);
-    socket.on('user-connected', id=>{
-        console.log("User Connected Streaming User The Movie");
-        const call = myPeer.call(id, stream);
-        peers[id] = call;
+    socket.on('watcher-connected', id=>{
+        const call = Streamer.call(id, stream);
     })
 });
 

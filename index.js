@@ -21,12 +21,14 @@ const PORT = process.env.PORT || 80
 
 const streams = {};
 const host = {};
+const rooms = {};
 
 io.on('connection', socket => {
     
     socket.on('create-room', (roomId, peerId)=>{
         streams[roomId] = peerId;
         host[roomId] = socket;
+        rooms[roomId] = [socket];
         console.log('Room created with peerId of '+peerId);
         console.log("Room's Id: "+roomId);
     })
@@ -34,8 +36,23 @@ io.on('connection', socket => {
     socket.on('join-room', (roomId, id)=>{
         socket.emit('roomId', streams[roomId]);
         console.log("Viewer Entered in Room: "+roomId);
-        host[roomId].emit('user-connected', id);
+        host[roomId].emit('watcher-connected', id);
     })
+
+    socket.on('join-call', (roomId, id)=>{
+        rooms[roomId].forEach(peer => {
+            peer.emit('user-connected', id);
+        });
+
+        rooms[roomId].push(socket);
+        
+        socket.on('disconnect', ()=>{
+            rooms[roomId].forEach(peer => {
+                peer.emit('user-disconnected', id);
+            });
+        })
+    })
+
 })
 
 require('./routes/torrent')(app);
