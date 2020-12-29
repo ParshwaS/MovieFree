@@ -9,7 +9,7 @@ document.getElementById('play').addEventListener('click', ()=>{
     const myPeer = new Peer()
     const myVideo = document.createElement('video');
     myVideo.muted = true;
-    var getUserMedia = navigator.getUserMedia
+    var getUserMedia = navigator.mediaDevices.getUserMedia
     if(!getUserMedia)
         getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
     getUserMedia({video: true, audio: true}).then(stream => {
