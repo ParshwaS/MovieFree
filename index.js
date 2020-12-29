@@ -33,6 +33,14 @@ io.on('connection', socket => {
         rooms[roomId] = [socket];
         console.log('Room created with peerId of '+peerId);
         console.log("Room's Id: "+roomId);
+        socket.on('disconnect', ()=>{
+            rooms[roomId].forEach(peer => {
+                peer.emit('host-disconnected');
+                delete rooms[roomId];
+                delete host[roomId];
+                delete streams[roomId];
+            })
+        })
     })
 
     socket.on('join-room', (roomId, id)=>{
