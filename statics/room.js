@@ -33,7 +33,7 @@ document.getElementById('play').addEventListener('click', ()=>{
 
     socket.on('host-disconnected', ()=>{
         document.getElementsByClassName('mainScreen')[0].remove();
-        document.body.append("<h2 class='text-center' style='margin-top: 2rem'>Host has ended the stream!</h2>");
+        $('body').append("<h2 class='text-center' style='margin-top: 2rem'>Host has ended the stream!</h2>");
     })
     
     function connectTo(id, stream){

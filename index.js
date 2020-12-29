@@ -36,30 +36,34 @@ io.on('connection', socket => {
         socket.on('disconnect', ()=>{
             rooms[roomId].forEach(peer => {
                 peer.emit('host-disconnected');
-                delete rooms[roomId];
-                delete host[roomId];
-                delete streams[roomId];
             })
+            delete rooms[roomId];
+            delete host[roomId];
+            delete streams[roomId];
         })
     })
 
     socket.on('join-room', (roomId, id)=>{
         socket.emit('roomId', streams[roomId]);
         console.log("Viewer Entered in Room: "+roomId);
-        host[roomId].emit('watcher-connected', id);
+        if(host[roomId]) host[roomId].emit('watcher-connected', id);
     })
 
     socket.on('join-call', (roomId, id)=>{
-        rooms[roomId].forEach(peer => {
-            peer.emit('user-connected', id);
-        });
-
-        rooms[roomId].push(socket);
+        if(rooms[roomId]){
+            rooms[roomId].forEach(peer => {
+                peer.emit('user-connected', id);
+            });
+    
+            rooms[roomId].push(socket);
+        }
 
         socket.on('disconnect', ()=>{
-            rooms[roomId].forEach(peer => {
-                peer.emit('user-disconnected', id);
-            });
+            if(rooms[roomId]){
+                rooms[roomId].forEach(peer => {
+                    peer.emit('user-disconnected', id);
+                });
+            }
         })
     })
 
