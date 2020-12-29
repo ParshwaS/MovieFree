@@ -4,7 +4,11 @@ const mongoose = require('mongoose');
 const comp = require('compression');
 const bp = require('body-parser');
 const app = express()
-const server = require('http').Server(app);
+const fs = require('fs')
+var privateKey  = fs.readFileSync('host.key', 'utf8');
+var certificate = fs.readFileSync('host.cer', 'utf8');
+var credentials = {key: privateKey, cert: certificate};
+const server = require('https').createServer(credentials, app);
 const cors = require('cors')
 const { ExpressPeerServer } = require('peer');
 const peerServer = ExpressPeerServer(server,{
@@ -16,8 +20,6 @@ app.use(bp.json({limit: '50mb'}));
 app.use(comp());
 app.use(cors());
 app.use('/peerjs', peerServer);
-
-const PORT = process.env.PORT || 80
 
 const streams = {};
 const host = {};
@@ -45,7 +47,7 @@ io.on('connection', socket => {
         });
 
         rooms[roomId].push(socket);
-        
+
         socket.on('disconnect', ()=>{
             rooms[roomId].forEach(peer => {
                 peer.emit('user-disconnected', id);
@@ -80,6 +82,12 @@ app.get('/newNewglu', (req, res)=>{
 
 app.use(express.static('./statics'));
 
-server.listen(PORT,()=>{
+// var httpsServer = https.createServer(credentials, app);
+
+server.listen(443,()=>{
     console.log("Server started...");
 });
+
+// httpsServer.listen(443, ()=>{
+//     console.log("Secured Server Started...");
+// })

@@ -50,28 +50,6 @@ const peers = {};
 let myVideoStream;
 const myVideo = document.createElement('video');
 myVideo.muted = true;
-var getUserMedia = navigator.mediaDevices.getUserMedia
-if(!getUserMedia)
-    getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-getUserMedia({video: true, audio: true}).then(stream => {
-    myVideoStream = stream;
-    addVideo(myVideo, myVideoStream);
-    myPeer.on('call', call=>{
-        call.answer(stream);
-        const video = document.createElement('video');
-        call.on('stream', uStream=>{
-            addVideo(video, uStream);
-        })
-    })
-
-    socket.on('user-connected', (id)=>{
-        connectTo(id, stream);
-    })
-})
-
-socket.on('user-disconnected', (id)=>{
-    if(peers[id]) peers[id].close();
-})
 
 function connectTo(id, stream){
     const call = myPeer.call(id, stream);
@@ -139,6 +117,25 @@ $('#fullScreen').on('click', ()=>{
 $('#share').on('click', ()=>{
     let VPlayer = document.getElementById('VPlayer');
     let stream;
+    navigator.mediaDevices.getUserMedia({video: true, audio: true}).then(stream => {
+        myVideoStream = stream;
+        addVideo(myVideo, myVideoStream);
+        myPeer.on('call', call=>{
+            call.answer(stream);
+            const video = document.createElement('video');
+            call.on('stream', uStream=>{
+                addVideo(video, uStream);
+            })
+        })
+    
+        socket.on('user-connected', (id)=>{
+            connectTo(id, stream);
+        })
+    })
+    
+    socket.on('user-disconnected', (id)=>{
+        if(peers[id]) peers[id].close();
+    })
     const fps=0;
     if(VPlayer.captureStream){
         stream = VPlayer.captureStream(fps);
