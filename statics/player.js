@@ -44,21 +44,14 @@ $('#sub_delay').on('change', () => {
     addOffset('VPlayer', parseFloat($('#sub_delay').val()) - delay);
 });
 var id;
-const Streamer = new Peer(undefined, {
-    host: '/',
-    path: '/peerjs',
-    port: '80'
-})
-const myPeer = new Peer(undefined, {
-    host: '/',
-    path: '/peerjs',
-    port: '80'
-})
+const Streamer = new Peer()
+const myPeer = new Peer()
 const peers = {};
 let myVideoStream;
 const myVideo = document.createElement('video');
 myVideo.muted = true;
-navigator.mediaDevices.getUserMedia({video: true, audio: true}).then(stream => {
+var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+getUserMedia({video: true, audio: true}).then(stream => {
     myVideoStream = stream;
     addVideo(myVideo, myVideoStream);
     myPeer.on('call', call=>{
@@ -155,6 +148,7 @@ $('#share').on('click', ()=>{
     }
     $('#room').append('RoomId = '+roomId);
     socket.on('watcher-connected', id=>{
+        console.log(id);
         const call = Streamer.call(id, stream);
     })
 });

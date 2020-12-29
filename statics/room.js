@@ -4,20 +4,13 @@ let myVideoStream;
 
 document.getElementById('play').addEventListener('click', ()=>{
     document.getElementById('play').remove();
-    const Watcher = new Peer(undefined, {
-        host: '/',
-        path: '/peerjs',
-        port: '80'
-    })
+    const Watcher = new Peer()
 
-    const myPeer = new Peer(undefined, {
-        host: '/',
-        path: '/peerjs',
-        port: '80'
-    })
+    const myPeer = new Peer()
     const myVideo = document.createElement('video');
     myVideo.muted = true;
-    navigator.mediaDevices.getUserMedia({video: true, audio: true}).then(stream => {
+    var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+    getUserMedia({video: true, audio: true}).then(stream => {
         myVideoStream = stream;
         addVideo(myVideo, myVideoStream);
         myPeer.on('call', call=>{
