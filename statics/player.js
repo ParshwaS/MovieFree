@@ -50,7 +50,9 @@ const peers = {};
 let myVideoStream;
 const myVideo = document.createElement('video');
 myVideo.muted = true;
-var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+var getUserMedia = navigator.getUserMedia
+if(!getUserMedia)
+    getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 getUserMedia({video: true, audio: true}).then(stream => {
     myVideoStream = stream;
     addVideo(myVideo, myVideoStream);
