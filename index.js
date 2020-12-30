@@ -9,6 +9,15 @@ var privateKey  = fs.readFileSync('host.key', 'utf8');
 var certificate = fs.readFileSync('host.cer', 'utf8');
 var credentials = {key: privateKey, cert: certificate};
 const server = require('https').createServer(credentials, app);
+
+// HTTP to HTTPS
+
+var http = express();
+http.get('*', function(req, res) {  
+    res.redirect('https://' + req.headers.host + req.url);
+})
+http.listen(80);
+
 const cors = require('cors')
 const { ExpressPeerServer } = require('peer');
 const peerServer = ExpressPeerServer(server,{
@@ -52,7 +61,9 @@ io.on('connection', socket => {
     socket.on('join-call', (roomId, id)=>{
         if(rooms[roomId]){
             rooms[roomId].forEach(peer => {
-                peer.emit('user-connected', id);
+                if(peer.connected){
+                    peer.emit('user-connected', id);
+                }
             });
     
             rooms[roomId].push(socket);
@@ -61,7 +72,9 @@ io.on('connection', socket => {
         socket.on('disconnect', ()=>{
             if(rooms[roomId]){
                 rooms[roomId].forEach(peer => {
-                    peer.emit('user-disconnected', id);
+                    if(peer.connected){
+                        peer.emit('user-disconnected', id);
+                    }
                 });
             }
         })
@@ -94,12 +107,6 @@ app.get('/newNewglu', (req, res)=>{
 
 app.use(express.static('./statics'));
 
-// var httpsServer = https.createServer(credentials, app);
-
 server.listen(443,()=>{
     console.log("Server started...");
 });
-
-// httpsServer.listen(443, ()=>{
-//     console.log("Secured Server Started...");
-// })
