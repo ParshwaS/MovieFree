@@ -10,13 +10,15 @@ var certificate = fs.readFileSync('host.cer', 'utf8');
 var credentials = {key: privateKey, cert: certificate};
 const server = require('https').createServer(credentials, app);
 
+const PORT = process.env.PORT;
+
 // HTTP to HTTPS
 
 var http = express();
 http.get('*', function(req, res) {  
     res.redirect('https://' + req.headers.host + req.url);
 })
-http.listen(80);
+http.listen(PORT);
 
 const cors = require('cors')
 const { ExpressPeerServer } = require('peer');
