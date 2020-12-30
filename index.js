@@ -19,7 +19,9 @@ var http = express();
 http.get('*', function(req, res) {  
     res.redirect('https://' + req.headers.host + req.url);
 })
-http.listen(PORT);
+var listen = http.listen(PORT,()=>{
+    console.log("Secondary Server Started On Port "+listen.address().port);
+});
 
 const cors = require('cors')
 const { ExpressPeerServer } = require('peer');
@@ -111,5 +113,5 @@ app.get('/newNewglu', (req, res)=>{
 app.use(express.static('./statics'));
 
 server.listen(PORTS,()=>{
-    console.log("Server started...");
+    console.log("Server started on PORT "+server.address().port);
 });
