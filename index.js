@@ -10,8 +10,8 @@ var certificate = fs.readFileSync('host.cer', 'utf8');
 var credentials = {key: privateKey, cert: certificate};
 const server = require('https').createServer(credentials, app);
 
-const PORT = process.env.PORT;
-const PORTS = process.env.PORTS;
+const PORT = 80;
+const PORTS = 443;
 
 // HTTP to HTTPS
 
