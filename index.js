@@ -11,6 +11,7 @@ var credentials = {key: privateKey, cert: certificate};
 const server = require('https').createServer(credentials, app);
 
 const PORT = process.env.PORT;
+const PORTS = process.env.PORTS;
 
 // HTTP to HTTPS
 
@@ -109,6 +110,6 @@ app.get('/newNewglu', (req, res)=>{
 
 app.use(express.static('./statics'));
 
-server.listen(443,()=>{
+server.listen(PORTS,()=>{
     console.log("Server started...");
 });
