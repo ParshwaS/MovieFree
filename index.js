@@ -16,6 +16,9 @@ const PORTS = 443;
 // HTTP to HTTPS
 
 var http = express();
+http.get('/.well-known/pki-validation/D8BECDC63A87B87D0E7452A3AF93CEE2.txt', (req, res)=>{
+    res.sendFile(__dirname+'/D8BECDC63A87B87D0E7452A3AF93CEE2.txt');
+});
 http.get('*', function(req, res) {  
     res.redirect('https://' + req.headers.host + req.url);
 })
