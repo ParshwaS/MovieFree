@@ -94,6 +94,10 @@ app.get('/', (req, res)=>{
     res.sendFile(__dirname+'/index.html');
 });
 
+app.get('/.well-known/pki-validation/D8BECDC63A87B87D0E7452A3AF93CEE2.txt', (req, res)=>{
+    res.sendFile(__dirname+'/D8BECDC63A87B87D0E7452A3AF93CEE2.txt');
+});
+
 app.get('/player/:mag', (req, res)=>{
     res.sendFile(__dirname+'/player.html');
 });
