@@ -5,8 +5,8 @@ const comp = require('compression');
 const bp = require('body-parser');
 const app = express()
 const fs = require('fs')
-var privateKey  = fs.readFileSync('host.key', 'utf8');
-var certificate = fs.readFileSync('host.cer', 'utf8');
+var privateKey  = fs.readFileSync('private.key', 'utf8');
+var certificate = fs.readFileSync('certificate.crt', 'utf8');
 var credentials = {key: privateKey, cert: certificate};
 const server = require('https').createServer(credentials, app);
 
