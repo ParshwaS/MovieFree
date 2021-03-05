@@ -109,6 +109,10 @@ app.get('/room/:id', (req, res)=>{
     res.sendFile(__dirname+'/room.html');
 });
 
+app.get('/about', (req, res)=>{
+    res.sendFile(__dirname+'/about.html');
+});
+
 app.get('/newNewFlu', (req, res)=>{
     res.sendFile(__dirname+'/addNew.html');
 });
