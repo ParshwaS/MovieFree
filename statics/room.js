@@ -98,6 +98,10 @@ $('#mute').on('click', ()=>{
     }
 })
 
+$('#fullScreen').on('click', ()=>{
+    $('.mainScreen')[0].requestFullscreen();
+});
+
 $('#turnV').on('click', ()=>{
     let en = myVideoStream.getVideoTracks()[0].enabled;
     if(en){
