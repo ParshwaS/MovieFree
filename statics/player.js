@@ -44,8 +44,8 @@ $('#sub_delay').on('change', () => {
     addOffset('VPlayer', parseFloat($('#sub_delay').val()) - delay);
 });
 var id;
-const Streamer = new Peer()
-const myPeer = new Peer()
+const Streamer = new Peer({host: '/', path: '/peerjs'})
+const myPeer = new Peer({host: '/', path: '/peerjs'})
 const peers = {};
 let myVideoStream;
 const myVideo = document.createElement('video');

@@ -120,7 +120,7 @@ module.exports = function(app){
                 'Content-Range': "bytes " + start + "-" + end +"/" + file_size,
                 'Accept-Range': "bytes",
                 'Content-Length': chunksize,
-                'Content-Type': "video/mp4"
+                'Content-Type': "video/mkv"
             }
             res.writeHead(206, head)
             let stream_pos = {

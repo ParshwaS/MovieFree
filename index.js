@@ -43,7 +43,7 @@ const host = {};
 const rooms = {};
 
 io.on('connection', socket => {
-    
+    console.log("Connection")
     socket.on('create-room', (roomId, peerId)=>{
         streams[roomId] = peerId;
         host[roomId] = socket;

@@ -1,3 +1,8 @@
 node_modules/
 tmp/
 public/
+host_old.cer
+host_key.cer
+certificate.crt
+ca_bundle.crt
+private.key

@@ -4,9 +4,9 @@ let myVideoStream;
 const peers = {};
 document.getElementById('play').addEventListener('click', ()=>{
     document.getElementById('play').remove();
-    const Watcher = new Peer()
+    const Watcher = new Peer({host: '/', path: '/peerjs'})
 
-    const myPeer = new Peer()
+    const myPeer = new Peer({host: '/', path: '/peerjs'})
     const myVideo = document.createElement('video');
     myVideo.muted = true;
     
